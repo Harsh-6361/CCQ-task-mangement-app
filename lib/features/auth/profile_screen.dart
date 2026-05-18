@@ -235,8 +235,8 @@ class ProfileScreen extends ConsumerWidget {
 
   Future<void> _showUpdateDialog(BuildContext context, UpdateInfo update) async {
     final versionLabel = update.versionName.isEmpty
-        ? 'A newer version is available.'
-        : 'Version ${update.versionName} is available.'
+        ? 'A newer version is available'
+        : 'Version ${update.versionName} is available';
 
     return showDialog<void>(
       context: context,
