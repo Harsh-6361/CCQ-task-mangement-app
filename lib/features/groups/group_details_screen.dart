@@ -73,7 +73,7 @@ class _GroupDetailsScreenState extends ConsumerState<GroupDetailsScreen>
                   controller: _tabController,
                   children: [
                     _buildChatTab(activeUserId, group, isAdmin: isAdmin, isMember: isMember),
-                    _buildTasksTab(group),
+                    _buildTasksTab(group, activeUserId),
                     _buildMembersTab(group, activeUserId),
                   ],
                 )
@@ -284,35 +284,49 @@ class _GroupDetailsScreenState extends ConsumerState<GroupDetailsScreen>
     return uid.length <= 8 ? uid : uid.substring(0, 8);
   }
 
-  Widget _buildTasksTab(Group group) {
+  Widget _buildTasksTab(Group group, String userId) {
     final tasksAsync = ref.watch(groupTasksStreamProvider(group.id));
+    final usersStream = ref.watch(groupRepositoryProvider).watchUsers();
 
-    return tasksAsync.when(
-      data: (tasks) => tasks.isEmpty
-          ? const Center(child: Text('No group tasks found.'))
-          : ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: tasks.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final task = tasks[index];
-                return Card(
-                  child: CheckboxListTile(
-                    value: task.status == TaskStatus.done,
-                    title: Text(task.title),
-                    subtitle: Text('Assigned to: ${task.assignedToId ?? "Unassigned"}'),
-                    onChanged: (val) {
-                      final newStatus = val! ? TaskStatus.done : TaskStatus.todo;
-                      ref.read(taskRepositoryProvider).updateTask(
-                            task.copyWith(status: newStatus),
-                          );
-                    },
-                  ),
-                );
-              },
-            ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Error: $err')),
+    return StreamBuilder<List<AppUser>>(
+      stream: usersStream,
+      builder: (context, usersSnapshot) {
+        final users = usersSnapshot.data ?? const <AppUser>[];
+        final usersById = {for (final user in users) user.uid: user};
+
+        return tasksAsync.when(
+          data: (tasks) => tasks.isEmpty
+              ? const Center(child: Text('No group tasks found.'))
+              : ListView.separated(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: tasks.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final task = tasks[index];
+                    final assignee = task.assignedToId == null
+                        ? null
+                        : usersById[task.assignedToId!];
+                    final assigneeLabel =
+                        _displayName(assignee, task.assignedToId ?? '-');
+                    return Card(
+                      child: CheckboxListTile(
+                        value: task.status == TaskStatus.done,
+                        title: Text(task.title),
+                        subtitle: Text('Assigned to: $assigneeLabel'),
+                        onChanged: (val) {
+                          final newStatus = val! ? TaskStatus.done : TaskStatus.todo;
+                          ref.read(taskRepositoryProvider).updateTask(
+                                task.copyWith(status: newStatus),
+                              );
+                        },
+                      ),
+                    );
+                  },
+                ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
+        );
+      },
     );
   }
 
