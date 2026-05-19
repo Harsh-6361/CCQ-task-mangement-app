@@ -33,7 +33,7 @@ final class TaskControllerProvider
   TaskController create() => TaskController();
 }
 
-String _$taskControllerHash() => r'19ce9670c38c55fce57dfc881096ec71e9d0259b';
+String _$taskControllerHash() => r'af9f10e221af7f3e03f97f301056750a86f92db9';
 
 abstract class _$TaskController extends $AsyncNotifier<void> {
   FutureOr<void> build();
@@ -114,7 +114,7 @@ final class FilteredTasksProvider
   }
 }
 
-String _$filteredTasksHash() => r'ae7f85c74eecd2023e21500c1b7cdf0b856cbde6';
+String _$filteredTasksHash() => r'8c5e2260adab148e910eee4dcea2849cb97f0bcf';
 
 final class FilteredTasksFamily extends $Family
     with

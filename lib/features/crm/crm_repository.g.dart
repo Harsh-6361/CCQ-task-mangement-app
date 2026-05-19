@@ -124,6 +124,44 @@ final class LeadsStreamFamily extends $Family
   String toString() => r'leadsStreamProvider';
 }
 
+@ProviderFor(allLeadsStream)
+final allLeadsStreamProvider = AllLeadsStreamProvider._();
+
+final class AllLeadsStreamProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Lead>>,
+          List<Lead>,
+          Stream<List<Lead>>
+        >
+    with $FutureModifier<List<Lead>>, $StreamProvider<List<Lead>> {
+  AllLeadsStreamProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allLeadsStreamProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allLeadsStreamHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<Lead>> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<Lead>> create(Ref ref) {
+    return allLeadsStream(ref);
+  }
+}
+
+String _$allLeadsStreamHash() => r'55ae8683a44f24868bb8a1fecc0474a2d80bcc03';
+
 @ProviderFor(meetingsStream)
 final meetingsStreamProvider = MeetingsStreamFamily._();
 

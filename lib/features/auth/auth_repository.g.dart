@@ -159,6 +159,151 @@ final class CurrentUserProfileProvider
 String _$currentUserProfileHash() =>
     r'3a20d1c2b85ce5cf910a1b29d256030c6f0bd139';
 
+@ProviderFor(userProfile)
+final userProfileProvider = UserProfileFamily._();
+
+final class UserProfileProvider
+    extends
+        $FunctionalProvider<AsyncValue<AppUser?>, AppUser?, FutureOr<AppUser?>>
+    with $FutureModifier<AppUser?>, $FutureProvider<AppUser?> {
+  UserProfileProvider._({
+    required UserProfileFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'userProfileProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$userProfileHash();
+
+  @override
+  String toString() {
+    return r'userProfileProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<AppUser?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<AppUser?> create(Ref ref) {
+    final argument = this.argument as String;
+    return userProfile(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserProfileProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$userProfileHash() => r'e2ac0b113b64893590f368cb09c18fa46e1479bd';
+
+final class UserProfileFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<AppUser?>, String> {
+  UserProfileFamily._()
+    : super(
+        retry: null,
+        name: r'userProfileProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  UserProfileProvider call(String uid) =>
+      UserProfileProvider._(argument: uid, from: this);
+
+  @override
+  String toString() => r'userProfileProvider';
+}
+
+@ProviderFor(usersByIds)
+final usersByIdsProvider = UsersByIdsFamily._();
+
+final class UsersByIdsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AppUser>>,
+          List<AppUser>,
+          FutureOr<List<AppUser>>
+        >
+    with $FutureModifier<List<AppUser>>, $FutureProvider<List<AppUser>> {
+  UsersByIdsProvider._({
+    required UsersByIdsFamily super.from,
+    required List<String> super.argument,
+  }) : super(
+         retry: null,
+         name: r'usersByIdsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$usersByIdsHash();
+
+  @override
+  String toString() {
+    return r'usersByIdsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AppUser>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AppUser>> create(Ref ref) {
+    final argument = this.argument as List<String>;
+    return usersByIds(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UsersByIdsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$usersByIdsHash() => r'6ba1478020a7e7ce219735a7268c813a16e7fa56';
+
+final class UsersByIdsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<AppUser>>, List<String>> {
+  UsersByIdsFamily._()
+    : super(
+        retry: null,
+        name: r'usersByIdsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  UsersByIdsProvider call(List<String> uids) =>
+      UsersByIdsProvider._(argument: uids, from: this);
+
+  @override
+  String toString() => r'usersByIdsProvider';
+}
+
 @ProviderFor(ActiveUserContext)
 final activeUserContextProvider = ActiveUserContextProvider._();
 

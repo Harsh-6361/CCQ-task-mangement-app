@@ -56,6 +56,21 @@ class AuthRepository {
           (doc) => doc.exists ? AppUser.fromFirestore(doc) : null,
         );
   }
+
+  Future<AppUser?> getUserProfile(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    if (!doc.exists) return null;
+    return AppUser.fromFirestore(doc);
+  }
+
+  Future<List<AppUser>> getUsersByIds(List<String> uids) async {
+    final List<AppUser> users = [];
+    for (final uid in uids) {
+      final user = await getUserProfile(uid);
+      if (user != null) users.add(user);
+    }
+    return users;
+  }
 }
 
 @riverpod
@@ -78,6 +93,16 @@ Stream<AppUser?> currentUserProfile(Ref ref) {
   final uid = ref.watch(userIdProvider);
   if (uid == null) return Stream.value(null);
   return ref.watch(authRepositoryProvider).watchUserProfile(uid);
+}
+
+@riverpod
+Future<AppUser?> userProfile(Ref ref, String uid) {
+  return ref.watch(authRepositoryProvider).getUserProfile(uid);
+}
+
+@riverpod
+Future<List<AppUser>> usersByIds(Ref ref, List<String> uids) {
+  return ref.watch(authRepositoryProvider).getUsersByIds(uids);
 }
 
 // MASQUERADE CONTEXT

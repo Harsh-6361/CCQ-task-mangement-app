@@ -14,7 +14,7 @@ class LeadsScreen extends ConsumerWidget {
     final activeUserId = ref.watch(activeUserContextProvider);
     if (activeUserId == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
-    final leadsAsync = ref.watch(leadsStreamProvider(activeUserId));
+    final leadsAsync = ref.watch(allLeadsStreamProvider);
 
     return Scaffold(
       appBar: AppBar(
