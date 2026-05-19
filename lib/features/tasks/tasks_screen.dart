@@ -205,18 +205,17 @@ class _AddTaskSheetState extends ConsumerState<_AddTaskSheet> {
               ),
             ],
           ),
-          if (_selectedGroupId != null) ...[
+if (_selectedGroupId != null) ...[
             const SizedBox(height: 16),
             groupsAsync.when(
               data: (groups) {
                 final group = groups.firstWhere((g) => g.id == _selectedGroupId);
-                return DropdownButtonFormField<String?>(
-                  initialValue: _assignedToId,
-                  decoration: const InputDecoration(labelText: 'Assign To', border: OutlineInputBorder()),
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text('Unassigned')),
-                    ...group.members.map((m) => DropdownMenuItem(value: m, child: Text(m))),
-                  ],
+                if (group.members.isEmpty) {
+                  return const Text('No members in this team');
+                }
+                return _MemberDropdown(
+                  members: group.members,
+                  selectedId: _assignedToId,
                   onChanged: (val) => setState(() => _assignedToId = val),
                 );
               },
@@ -275,6 +274,45 @@ class _AddTaskSheetState extends ConsumerState<_AddTaskSheet> {
       return;
     }
 
-    Navigator.pop(context);
+Navigator.pop(context);
+  }
+}
+
+class _MemberDropdown extends ConsumerWidget {
+  final List<String> members;
+  final String? selectedId;
+  final ValueChanged<String?> onChanged;
+
+  const _MemberDropdown({
+    required this.members,
+    required this.selectedId,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final usersAsync = ref.watch(usersByIdsProvider(members));
+
+    return usersAsync.when(
+      data: (users) => DropdownButtonFormField<String?>(
+        initialValue: selectedId,
+        decoration: const InputDecoration(labelText: 'Assign To', border: OutlineInputBorder()),
+        items: [
+          const DropdownMenuItem(value: null, child: Text('Unassigned')),
+          ...users.map((u) => DropdownMenuItem(value: u.uid, child: Text(u.email))),
+        ],
+        onChanged: onChanged,
+      ),
+      loading: () => const LinearProgressIndicator(),
+      error: (e, _) => DropdownButtonFormField<String?>(
+        initialValue: selectedId,
+        decoration: const InputDecoration(labelText: 'Assign To', border: OutlineInputBorder()),
+        items: [
+          const DropdownMenuItem(value: null, child: Text('Unassigned')),
+          ...members.map((m) => DropdownMenuItem(value: m, child: Text(m))),
+        ],
+        onChanged: onChanged,
+      ),
+    );
   }
 }

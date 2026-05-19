@@ -33,7 +33,7 @@ final class CrmControllerProvider
   CrmController create() => CrmController();
 }
 
-String _$crmControllerHash() => r'db61c7fb6f2ce14dcd57ea4edfe28369e35ec434';
+String _$crmControllerHash() => r'5fdf30d04f9f4bb86fd59c78d88e0e5e9973258f';
 
 abstract class _$CrmController extends $AsyncNotifier<void> {
   FutureOr<void> build();

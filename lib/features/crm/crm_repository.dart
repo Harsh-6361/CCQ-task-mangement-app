@@ -10,11 +10,20 @@ class CrmRepository {
 
   CrmRepository(this._firestore);
 
-  // Leads
+// Leads
   Stream<List<Lead>> watchLeads(String userId) {
     return _firestore
         .collection('leads')
         .where('ownerId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) => _sortLeadsNewestFirst(
+              snapshot.docs.map((doc) => Lead.fromFirestore(doc)).toList(),
+            ));
+  }
+
+  Stream<List<Lead>> watchAllLeads() {
+    return _firestore
+        .collection('leads')
         .snapshots()
         .map((snapshot) => _sortLeadsNewestFirst(
               snapshot.docs.map((doc) => Lead.fromFirestore(doc)).toList(),
@@ -87,6 +96,11 @@ CrmRepository crmRepository(Ref ref) {
 @riverpod
 Stream<List<Lead>> leadsStream(Ref ref, String userId) {
   return ref.watch(crmRepositoryProvider).watchLeads(userId);
+}
+
+@riverpod
+Stream<List<Lead>> allLeadsStream(Ref ref) {
+  return ref.watch(crmRepositoryProvider).watchAllLeads();
 }
 
 @riverpod

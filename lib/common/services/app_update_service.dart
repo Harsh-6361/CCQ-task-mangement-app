@@ -3,9 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
-const String updateInfoUrl =
-  'https://github.com/Harsh-6361/CCQ-task-mangement-app/releases/latest/download/update.json';
-
 class UpdateInfo {
   const UpdateInfo({
     required this.versionCode,
@@ -35,24 +32,47 @@ class UpdateInfo {
 }
 
 class AppUpdateService {
+  AppUpdateService({this.updateInfoUrl});
+
+  final String? updateInfoUrl;
+
+  String get _url => updateInfoUrl ?? 
+    'https://raw.githubusercontent.com/Harsh-6361/CCQ-task-mangement-app/main/update.json';
+
   Future<UpdateInfo?> checkForUpdate() async {
-    final info = await fetchUpdateInfo();
-    if (info == null || info.apkUrl.isEmpty) return null;
+    try {
+      final info = await fetchUpdateInfo();
+      if (info == null || info.apkUrl.isEmpty) return null;
 
-    final packageInfo = await PackageInfo.fromPlatform();
-    final localVersionCode = int.tryParse(packageInfo.buildNumber) ?? 0;
+      final packageInfo = await PackageInfo.fromPlatform();
+      final localBuildNumber = int.tryParse(packageInfo.buildNumber) ?? 0;
+      final localVersion = packageInfo.version;
 
-    if (info.versionCode <= localVersionCode) return null;
-    return info;
+      if (info.versionCode > localBuildNumber) return info;
+
+      if (info.versionName.isNotEmpty && info.versionName != localVersion) {
+        return info;
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<UpdateInfo?> fetchUpdateInfo() async {
-    final response = await http.get(Uri.parse(updateInfoUrl));
-    if (response.statusCode != 200) return null;
+    try {
+      final response = await http.get(Uri.parse(_url)).timeout(
+        const Duration(seconds: 10),
+      );
+      if (response.statusCode != 200) return null;
 
-    final data = jsonDecode(response.body);
-    if (data is! Map<String, dynamic>) return null;
+      final data = jsonDecode(response.body);
+      if (data is! Map<String, dynamic>) return null;
 
-    return UpdateInfo.fromJson(data);
+      return UpdateInfo.fromJson(data);
+    } catch (e) {
+      return null;
+    }
   }
 }
