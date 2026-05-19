@@ -59,8 +59,9 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: github.event_name == 'push'
+        continue-on-error: true
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: Release v${{ steps.version.outputs.version }}
@@ -75,10 +76,6 @@ jobs:
             ### Installation
             Download the APK and install on your Android device.
           files: build/app/outputs/flutter-apk/app-release.apk
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create update.json
         if: github.event_name == 'push'
@@ -95,9 +92,8 @@ jobs:
 
       - name: Upload update.json to release
         if: github.event_name == 'push'
-        uses: softprops/action-gh-release@v1
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
           files: update.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
