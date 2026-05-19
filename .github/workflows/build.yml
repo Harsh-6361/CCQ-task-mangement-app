@@ -59,23 +59,14 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
         if: github.event_name == 'push'
         continue-on-error: true
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
-          body: |
-            ## APK Release v${{ steps.version.outputs.version }}
-
-            **Download:** app-release.apk (${{ steps.apk-info.outputs.apk_size }})
-
-            ### Changes
-            Built automatically from commit ${{ github.sha }}
-
-            ### Installation
-            Download the APK and install on your Android device.
-          files: build/app/outputs/flutter-apk/app-release.apk
+        run: |
+          cd build/app/outputs/flutter-apk
+          gh release create v${{ steps.version.outputs.version }} \
+            --title "Release v${{ steps.version.outputs.version }}" \
+            --notes "Auto-build release from commit ${{ github.sha }}"
+          gh release upload v${{ steps.version.outputs.version }} app-release.apk
 
       - name: Create update.json
         if: github.event_name == 'push'
@@ -93,7 +84,4 @@ jobs:
       - name: Upload update.json to release
         if: github.event_name == 'push'
         continue-on-error: true
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          files: update.json
+        run: gh release upload v${{ steps.version.outputs.version }} update.json
